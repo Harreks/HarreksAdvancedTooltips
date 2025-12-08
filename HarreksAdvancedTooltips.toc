@@ -1,0 +1,8 @@
+## Interface: 120000
+## Version: 1.1.0
+## Title: Harreks Advanced Tooltips
+## IconTexture: 979574
+## Notes: Enhancements for ability tooltips
+## Author: Harrek
+
+HarreksAdvancedTooltips.lua
