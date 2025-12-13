@@ -1,12 +1,5 @@
 --Edge cases: some talents buff a specific spell but don't mention that spell in the description, this is a list of them
-local talentsMissingName = {
-    ----Preservation Evoker
-    --Emerald Communion
-    [370960] = {
-        --Dreamwalker
-        [377082] = true
-    }
-}
+local talentsMissingName = {}
 
 --Edge cases: when a spell replaces another, the name of the replacement won't be on the talents while still affecting it, this is a list matching the replacement with the replaced
 local replacedSpells = {
@@ -16,9 +9,6 @@ local replacedSpells = {
     ----Mistweaver Monk
     --Rushing Wind Kick replaces Rising Sun Kick
     [467307] = 107428,
-    ----Restoration Shaman
-    --Cloudburst Totem replaces Healing Stream Totem
-    [157153] = 5394,
     -----Farseer Shaman
     --Ancestral Swiftness replaces Natures Swiftness
     [443454] = 378081,
@@ -56,13 +46,6 @@ local blacklistedTalents = {
     },
     --Rising Sun Kick
     [107428] = {
-        --Thunder Focus Tea
-        [116680] = true,
-        --Secret Infusion
-        [388491] = true
-    },
-    --Essence Font
-    [191837] = {
         --Thunder Focus Tea
         [116680] = true,
         --Secret Infusion
@@ -182,9 +165,16 @@ end
 local f = CreateFrame("Frame")
 f:RegisterEvent("PLAYER_LOGIN")
 f:RegisterEvent("TRAIT_CONFIG_UPDATED")
-f:SetScript("OnEvent", DelayedUpdate)
+f:SetScript("OnEvent", function(_, event)
+    if event == "PLAYER_LOGIN" then
+        HATDB = HATDB or {}
+    end
+    DelayedUpdate()
+end)
 
 local function SearchTreeCached(spellID, tooltip)
+    if HATDB['modifier'] and not IsShiftKeyDown() then return end
+
     local spellInfo = C_Spell.GetSpellInfo(spellID)
     if not spellInfo then return end
     local spellName = spellInfo.name
@@ -208,7 +198,7 @@ end
 
 if TooltipDataProcessor then
     TooltipDataProcessor.AddTooltipPostCall(TooltipDataProcessor.AllTypes, function(tooltip, data)
-        if not data or issecretvalue(data.type) then return end
+        if not data then return end
 
         if data.type == Enum.TooltipDataType.Spell and C_SpellBook.IsSpellInSpellBook(data.id) then
             SearchTreeCached(data.id, tooltip)
@@ -216,4 +206,21 @@ if TooltipDataProcessor then
             SearchTreeCached(data.lines[1].tooltipID, tooltip)
         end
     end)
+end
+
+SLASH_HARREKSADVANCEDTOOLTIPS1 = '/hat'
+SlashCmdList.HARREKSADVANCEDTOOLTIPS = function(msg)
+    local response = '|cnNORMAL_FONT_COLOR:Advanced Tooltips:|r '
+    if msg == '' then
+        response = response .. 'Type \'/hat mod\' to toggle displaying extra information only when the shift key is pressed on and off.'
+    elseif msg == 'mod' then
+        if not HATDB then
+            HATDB = { modifier = true }
+        else
+            HATDB.modifier = not HATDB.modifier
+        end
+        local newState = HATDB.modifier and 'on' or 'off'
+        response = response .. 'Shift modifier turned ' .. newState
+    end
+    print(response)
 end
