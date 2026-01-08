@@ -1,5 +1,5 @@
-## Interface: 110207, 120000, 120001
-## Version: 1.2.0
+## Interface: 120000, 120001
+## Version: 1.2.1
 ## Title: Harreks Advanced Tooltips
 ## IconTexture: 979574
 ## Notes: Enhancements for ability tooltips

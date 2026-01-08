@@ -1,5 +1,22 @@
 --Edge cases: some talents buff a specific spell but don't mention that spell in the description, this is a list of them
-local talentsMissingName = {}
+local talentsMissingName = {
+    ----Preservation Evoker
+    --Living Flame
+    [361469] = {
+        --Lifeforce Mender
+        [376179] = true
+    },
+    --Chronoflame
+    [431443] = {
+        --Lifeforce Mender
+        [376179] = true
+    },
+    --Fire Breath
+    [357208] = {
+        --Lifeforce Mender
+        [376179] = true
+    }
+}
 
 --Edge cases: when a spell replaces another, the name of the replacement won't be on the talents while still affecting it, this is a list matching the replacement with the replaced
 local replacedSpells = {
@@ -198,7 +215,7 @@ end
 
 if TooltipDataProcessor then
     TooltipDataProcessor.AddTooltipPostCall(TooltipDataProcessor.AllTypes, function(tooltip, data)
-        if not data then return end
+        if not data or issecretvalue(data.type) then return end
 
         if data.type == Enum.TooltipDataType.Spell and C_SpellBook.IsSpellInSpellBook(data.id) then
             SearchTreeCached(data.id, tooltip)
